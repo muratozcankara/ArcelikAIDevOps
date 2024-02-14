@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Abstractions;
 using System.Security.Claims;
 using System.Net.NetworkInformation;
+using Microsoft.AspNetCore.Identity;
 
 namespace ArcelikWebApi.Middlewares
 {
@@ -47,12 +48,24 @@ namespace ArcelikWebApi.Middlewares
             // Accessing the claims from the validated token
             var userEmailClaim = validatedToken.Claims.FirstOrDefault(c => c.Type == "sub");
 
+            var userRoleClaim = validatedToken.Claims.FirstOrDefault(c => c.Type == "userRole");
+
             if (userEmailClaim != null && !string.IsNullOrEmpty(userEmailClaim.Value))
             {
                 var userEmail = userEmailClaim.Value;
 
-                // Attach user email to the request
+                // Attach user email&role to the request
                 context.Items["UserEmail"] = userEmail;
+
+            }
+
+            if (userRoleClaim != null && !string.IsNullOrEmpty(userRoleClaim.Value))
+            {
+
+                var userRole = userRoleClaim.Value;
+
+                // Attach user email&role to the request
+                context.Items["UserRole"] = userRole;
             }
 
             context.Response.StatusCode = 200;
