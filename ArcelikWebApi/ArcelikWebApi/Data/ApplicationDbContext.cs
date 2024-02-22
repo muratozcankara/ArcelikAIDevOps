@@ -29,10 +29,6 @@ namespace ArcelikWebApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Users>()
-                .HasOne(u => u.WatchedVideo)
-                .WithMany()
-                .HasForeignKey(u => u.WatchedVideoId);
 
             //Relationship between choices and Questions
             modelBuilder.Entity<Choices>()
