@@ -28,19 +28,12 @@ namespace ArcelikWebApi.Controllers
                 return BadRequest("Video file is missing or empty.");
             }
 
-            // Query the database to find the last VideoId
-            int lastVideoId = await _dbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
-
-            // Increment the last VideoId to get the new VideoId
-            int newVideoId = lastVideoId + 1;
-
             // Upload the video file to Azure Blob Storage
             var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile);
 
             // Save the video metadata to the database
             var newVideo = new Video
             {
-                Id = newVideoId,
                 Title = videoDto.Title,
                 BlobStorageUrl = blobStorageUrl
             };

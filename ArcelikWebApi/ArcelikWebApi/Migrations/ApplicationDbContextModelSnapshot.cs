@@ -730,6 +730,9 @@ namespace ArcelikWebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("QuizPoint")
                         .HasColumnType("int");
 
@@ -746,8 +749,6 @@ namespace ArcelikWebApi.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("id");
-
-                    b.HasIndex("WatchedVideoId");
 
                     b.ToTable("Users");
                 });
@@ -768,9 +769,6 @@ namespace ArcelikWebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("VideoDuration")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Videos");
@@ -778,31 +776,21 @@ namespace ArcelikWebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample1.mp4",
-                            Title = "Video 1",
-                            VideoDuration = 5
-                        },
-                        new
-                        {
                             Id = 2,
                             BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample2.mp4",
-                            Title = "Video 2",
-                            VideoDuration = 8
+                            Title = "Video 2"
                         },
                         new
                         {
                             Id = 3,
                             BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4",
-                            Title = "Video 3",
-                            VideoDuration = 10
+                            Title = "Video 3"
                         },
                         new
                         {
                             Id = 4,
                             BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4",
-                            Title = "Video 4",
-                            VideoDuration = 11
+                            Title = "Video 4"
                         });
                 });
 
@@ -856,17 +844,6 @@ namespace ArcelikWebApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("ArcelikWebApi.Models.Users", b =>
-                {
-                    b.HasOne("ArcelikWebApi.Models.Video", "WatchedVideo")
-                        .WithMany()
-                        .HasForeignKey("WatchedVideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WatchedVideo");
                 });
 
             modelBuilder.Entity("ArcelikWebApi.Models.Quiz.Choices", b =>

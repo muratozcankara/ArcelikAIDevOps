@@ -66,7 +66,6 @@ namespace ArcelikWebApi.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Video>().HasData(
-                new Video { Id = 1, Title = "Video 1", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample1.mp4" },
                 new Video { Id = 2, Title = "Video 2", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample2.mp4" },
                 new Video { Id = 3, Title = "Video 3", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4" },
                 new Video { Id = 4, Title = "Video 4", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4" }

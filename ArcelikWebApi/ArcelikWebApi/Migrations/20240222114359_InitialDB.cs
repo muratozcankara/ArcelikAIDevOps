@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ArcelikWebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class FinalQuestionsAndMigration : Migration
+    public partial class InitialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -64,14 +64,31 @@ namespace ArcelikWebApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isWatchedAll = table.Column<bool>(type: "bit", nullable: false),
+                    isTutorialDone = table.Column<bool>(type: "bit", nullable: false),
+                    QuizPoint = table.Column<int>(type: "int", nullable: false),
+                    IsPassed = table.Column<bool>(type: "bit", nullable: false),
+                    WatchedVideoId = table.Column<int>(type: "int", nullable: false),
+                    WatchedTimeInSeconds = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Videos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BlobStorageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VideoDuration = table.Column<int>(type: "int", nullable: false)
+                    BlobStorageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,29 +158,6 @@ namespace ArcelikWebApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    isWatchedAll = table.Column<bool>(type: "bit", nullable: false),
-                    isTutorialDone = table.Column<bool>(type: "bit", nullable: false),
-                    QuizPoint = table.Column<int>(type: "int", nullable: false),
-                    WatchedVideoId = table.Column<int>(type: "int", nullable: false),
-                    WatchedTimeInSeconds = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_Users_Videos_WatchedVideoId",
-                        column: x => x.WatchedVideoId,
-                        principalTable: "Videos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CorrectChoices",
                 columns: table => new
                 {
@@ -219,13 +213,12 @@ namespace ArcelikWebApi.Migrations
 
             migrationBuilder.InsertData(
                 table: "Videos",
-                columns: new[] { "Id", "BlobStorageUrl", "Title", "VideoDuration" },
+                columns: new[] { "Id", "BlobStorageUrl", "Title" },
                 values: new object[,]
                 {
-                    { 1, "https://arcelikstorage.blob.core.windows.net/videos/sample1.mp4", "Video 1", 5 },
-                    { 2, "https://arcelikstorage.blob.core.windows.net/videos/sample2.mp4", "Video 2", 8 },
-                    { 3, "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4", "Video 3", 10 },
-                    { 4, "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4", "Video 4", 11 }
+                    { 2, "https://arcelikstorage.blob.core.windows.net/videos/sample2.mp4", "Video 2" },
+                    { 3, "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4", "Video 3" },
+                    { 4, "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4", "Video 4" }
                 });
 
             migrationBuilder.InsertData(
@@ -346,11 +339,6 @@ namespace ArcelikWebApi.Migrations
                 table: "CorrectText",
                 column: "QuestionID",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_WatchedVideoId",
-                table: "Users",
-                column: "WatchedVideoId");
         }
 
         /// <inheritdoc />
@@ -375,10 +363,10 @@ namespace ArcelikWebApi.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Choices");
+                name: "Videos");
 
             migrationBuilder.DropTable(
-                name: "Videos");
+                name: "Choices");
 
             migrationBuilder.DropTable(
                 name: "Questions");
