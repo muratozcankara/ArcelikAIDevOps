@@ -65,5 +65,41 @@ namespace ArcelikWebApi.Controllers
 
             return NoContent(); // Return 204 No Content on successful deletion
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateVideo(int id, [FromForm] UpdateVideoDTO videoDto)
+        {
+            // Find the video in the database by ID
+            var video = await _dbContext.Videos.FindAsync(id);
+            if (video == null)
+            {
+                return NotFound(); // Video not found
+            }
+
+            // Update the video's title if provided
+            if (!string.IsNullOrEmpty(videoDto.Title))
+            {
+                video.Title = videoDto.Title;
+            }
+
+            else 
+            {
+                return BadRequest("Title should be given."); 
+            }
+
+            // Update the video file if provided
+            if (videoDto.VideoFile != null && videoDto.VideoFile.Length > 0)
+            {
+                // Upload the new video file to Azure Blob Storage
+                var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile);
+                video.BlobStorageUrl = blobStorageUrl;
+            }
+
+            // Save changes to the database
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(video); // Return the updated video object
+        }
+
     }
 }
