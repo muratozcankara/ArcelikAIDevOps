@@ -69,15 +69,10 @@ namespace ArcelikWebApi.Controllers
                 return NotFound(); // Video not found
             }
 
-            // Update the video's title if provided
-            if (!string.IsNullOrEmpty(videoDto.Title))
+            // Check if both title and video file are not provided
+            if (string.IsNullOrEmpty(videoDto.Title) && (videoDto.VideoFile == null || videoDto.VideoFile.Length == 0))
             {
-                video.Title = videoDto.Title;
-            }
-
-            else 
-            {
-                return BadRequest("Title should be given."); 
+                return BadRequest("You need to provide either the title or the video file to update.");
             }
 
             // Update the video file if provided
@@ -86,6 +81,12 @@ namespace ArcelikWebApi.Controllers
                 // Upload the new video file to Azure Blob Storage
                 var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile);
                 video.BlobStorageUrl = blobStorageUrl;
+            }
+
+            // Update the video's title if provided
+            if (!string.IsNullOrEmpty(videoDto.Title))
+            {
+                video.Title = videoDto.Title;
             }
 
             // Save changes to the database
