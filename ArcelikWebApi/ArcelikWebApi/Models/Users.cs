@@ -22,8 +22,6 @@ namespace ArcelikWebApi.Models
         // Properties for watched video
         public int WatchedVideoId { get; set; }
 
-        public Video WatchedVideo { get; set; }
-
         public int WatchedTimeInSeconds { get; set; }
     }
 }
