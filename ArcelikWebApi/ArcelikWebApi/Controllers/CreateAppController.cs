@@ -68,7 +68,7 @@ namespace ArcelikWebApi.Controllers
 
                     foreach (var pdfFile in formData.Pdfs)
                     {
-                        string blobUrl = await _blobService.Upload(pdfFile);
+                        string blobUrl = await _blobService.Upload(pdfFile, "file-upload");
                         blobUrls.Add(blobUrl);
                     }
                 aiApplication.Pdfs_Urls = string.Join(",", blobUrls);

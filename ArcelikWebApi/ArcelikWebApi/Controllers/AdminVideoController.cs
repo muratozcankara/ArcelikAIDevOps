@@ -20,6 +20,18 @@ namespace ArcelikWebApi.Controllers
             _blobService = blobService;
         }
 
+        [HttpGet]
+
+        public async Task<IActionResult> GetAllVideos()
+        {
+            var videos = await _dbContext.Videos
+                .Select(v => new { Id = v.Id, Title = v.Title })
+                .ToListAsync();
+
+            return Ok(videos);
+        }
+
+
         [HttpPost("upload")]
         public async Task<IActionResult> UploadVideo([FromForm] CreateVideoDTO videoDto)
         {
@@ -29,7 +41,7 @@ namespace ArcelikWebApi.Controllers
             }
 
             // Upload the video file to Azure Blob Storage
-            var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile);
+            var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, "videos");
 
             // Save the video metadata to the database
             var newVideo = new Video
@@ -48,12 +60,17 @@ namespace ArcelikWebApi.Controllers
         public async Task<IActionResult> DeleteVideo(int id)
         {
             var video = await _dbContext.Videos.FindAsync(id);
+
             if (video == null)
             {
                 return NotFound();
             }
 
+            // Delete the blob from blob storage
+            await _blobService.Delete(video.BlobStorageUrl, "videos"); // Replace "containerName" with your actual container name
+
             _dbContext.Videos.Remove(video);
+
             await _dbContext.SaveChangesAsync();
 
             return NoContent(); // Return 204 No Content on successful deletion
@@ -64,6 +81,7 @@ namespace ArcelikWebApi.Controllers
         {
             // Find the video in the database by ID
             var video = await _dbContext.Videos.FindAsync(id);
+
             if (video == null)
             {
                 return NotFound(); // Video not found
@@ -79,7 +97,7 @@ namespace ArcelikWebApi.Controllers
             if (videoDto.VideoFile != null && videoDto.VideoFile.Length > 0)
             {
                 // Upload the new video file to Azure Blob Storage
-                var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile);
+                var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, "videos");
                 video.BlobStorageUrl = blobStorageUrl;
             }
 
