@@ -6,8 +6,10 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Abstractions;
+using System.Security.Claims;
+using System.Net.NetworkInformation;
 
 namespace ArcelikWebApi.Middlewares
 {

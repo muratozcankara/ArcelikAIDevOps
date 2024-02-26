@@ -22,24 +22,37 @@ namespace ArcelikWebApi.Controllers
         {
             var userEmail = HttpContext.Items["UserEmail"] as string;
 
-            var StatusList = await _applicationDbContext.Users
+            var userStatus = await _applicationDbContext.Users
                 .Where(user => user.Email == userEmail)
                 .Select(user => new
                 {
-                    user.isWatchedAll,
                     user.WatchedVideoId,
-                    user.WatchedTimeInSeconds,
-                    user.isTutorialDone,
-                    VideoCount = _applicationDbContext.Videos.Count(), // Count of videos in the database,
-                    VideoDetails = _applicationDbContext.Videos
-                        .Select(video => new { video.Id, video.BlobStorageUrl })
-                        .ToList()
+                    user.WatchedTimeInSeconds
                 })
                 .FirstOrDefaultAsync();
 
+            var videoCount = await _applicationDbContext.Videos.CountAsync();
+            var lastVideoId = await _applicationDbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
+            var lastTimeInSeconds = 16;
 
-            return Ok(StatusList);
+            var isWatchedAll = userStatus.WatchedVideoId >= lastVideoId && userStatus.WatchedTimeInSeconds >= lastTimeInSeconds;
+
+            var videoDetails = await _applicationDbContext.Videos
+                .Select(video => new { video.Id, video.BlobStorageUrl })
+                .ToListAsync();
+
+            var statusList = new
+            {
+                userStatus.WatchedVideoId,
+                userStatus.WatchedTimeInSeconds,
+                VideoCount = videoCount,
+                VideoDetails = videoDetails,
+                IsWatchedAll = isWatchedAll
+            };
+
+            return Ok(statusList);
         }
+
 
         // POST: api/uservideo/watched
         [HttpPost("updatewatched")]
@@ -69,7 +82,7 @@ namespace ArcelikWebApi.Controllers
                     // Update the watched video and time
                     user.WatchedVideoId = request.WatchedVideoId;
                     user.WatchedTimeInSeconds = request.WatchedTimeInSeconds;
-                    user.isWatchedAll = request.IsWatchedAll;
+                    //.isWatchedAll = request.IsWatchedAll;
 
                     await _applicationDbContext.SaveChangesAsync();
 
@@ -85,7 +98,7 @@ namespace ArcelikWebApi.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpPost("updatetutorial")]
+        /*[HttpPost("updatetutorial")]
         public async Task<IActionResult> UpdateTutorialStatus([FromBody] TutorialViewModel tutorialrequest)
         {
             try
@@ -118,6 +131,6 @@ namespace ArcelikWebApi.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-        }
+        }*/
     }
 }

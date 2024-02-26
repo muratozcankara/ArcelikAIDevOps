@@ -11,9 +11,10 @@ namespace ArcelikWebApi.Models
 
         public string Email { get; set; }
 
-        public bool isWatchedAll { get; set; }
-
-        public bool isTutorialDone { get; set; }
+        //public bool isWatchedAll { get; set; }
+        
+        //public bool isTutorialDone { get; set; }
+        //front cache ile baksın isTutorialDone değerini db'de tutmayalim.
 
         public int QuizPoint { get; set; }
 
