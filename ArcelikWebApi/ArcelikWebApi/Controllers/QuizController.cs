@@ -17,6 +17,18 @@ namespace ArcelikWebApi.Controllers
             _context = context;
         }
 
+        [HttpGet("isPassedStatus")]
+        public async Task<ActionResult> GetIsPassedStatus()
+        {
+            var userEmailFromContext = HttpContext.Items["UserEmail"] as string;
+
+            var isPassed = await _context.Users
+                    .Where(u => u.Email == userEmailFromContext)
+                    .Select(u => u.IsPassed)
+                    .ToListAsync();
+
+            return Ok(isPassed);
+        }
 
         [HttpGet("questions")]
         public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions()
@@ -24,6 +36,7 @@ namespace ArcelikWebApi.Controllers
             // Retrieve 5 static questions for each question type
             var staticQuestions = await GetStaticQuestions();
 
+            
 
             // Retrieve 5 random questions for each question type
             var randomQuestions = await GetRandomQuestions();

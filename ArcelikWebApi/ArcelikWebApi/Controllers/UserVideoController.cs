@@ -16,7 +16,7 @@ namespace ArcelikWebApi.Controllers
         }
 
         // Get iswatched attirubute from db.
-        // GET: api/uservideo/iswatched
+        // GET: api/uservideo/status
         [HttpGet("status")]
         public async Task<IActionResult> GetUserVideoStatus()
         {
