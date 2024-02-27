@@ -21,6 +21,9 @@ namespace ArcelikWebApi.Controllers
         {
             var userEmail = HttpContext.Items["UserEmail"] as string;
 
+            if (string.IsNullOrEmpty(userEmail))
+                return BadRequest("User email not provided in the request");
+
             var userStatus = await _applicationDbContext.Users
                 .Where(user => user.Email == userEmail)
                 .Select(user => new
@@ -29,6 +32,9 @@ namespace ArcelikWebApi.Controllers
                     user.WatchedTimeInSeconds
                 })
                 .FirstOrDefaultAsync();
+
+            if (userStatus == null)
+                return NotFound("User not found");
 
             var videoCount = await _applicationDbContext.Videos.CountAsync();
             var lastVideoId = await _applicationDbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
@@ -57,43 +63,61 @@ namespace ArcelikWebApi.Controllers
         [HttpPost("updatewatched")]
         public async Task<IActionResult> UpdateWatchedStatus([FromBody] WatchedVideoUpdateRequest request)
         {
-            try
+            var userEmail = HttpContext.Items["UserEmail"] as string;
+
+            if (string.IsNullOrEmpty(userEmail))
+                return BadRequest("User email not provided in the request");
+
+            var user = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+
+            if (user == null)
+                return NotFound("User not found");
+
+            if (user.WatchedVideoId == request.WatchedVideoId)
             {
-                var userEmail = HttpContext.Items["UserEmail"] as string;
 
-                if (userEmail != null)
+                if (request.WatchedTimeInSeconds - user.WatchedTimeInSeconds <= 3)
                 {
-                    // Find the user by email
-                    var user = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-
-                    if (user == null)
-                    {
-                        return NotFound("User not found"); // Customize the response as needed
-                    }
-
-                    var video = _applicationDbContext.Videos.Find(request.WatchedVideoId);
-
-                    if (video == null)
-                    {
-                        return BadRequest("Invalid WatchedVideoId");
-                    }
-
                     // Update the watched video and time
-                    user.WatchedVideoId = request.WatchedVideoId;
                     user.WatchedTimeInSeconds = request.WatchedTimeInSeconds;
-
                     await _applicationDbContext.SaveChangesAsync();
-
                     return Ok("Watched video updated successfully");
                 }
                 else
                 {
-                    return BadRequest("User email not provided in the request"); // Customize the response as needed
+                    return BadRequest("Invalid time or duration exceeded");
                 }
             }
-            catch (Exception ex)
+            else if (request.WatchedVideoId > user.WatchedVideoId && (request.WatchedVideoId - user.WatchedVideoId) <= 1)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+
+                // Fetch the duration of the currently watched video from the database
+                var currentVideoDuration = await _applicationDbContext.Videos
+                    .Where(v => v.Id == user.WatchedVideoId)
+                    .Select(v => v.DurationInSeconds)
+                    .FirstOrDefaultAsync();
+
+                // Calculate the time difference between the current time of the current video
+                // and the start time of the requested video
+                var timeDifference = (currentVideoDuration - user.WatchedTimeInSeconds) + request.WatchedTimeInSeconds;
+
+                if (timeDifference <= 3)
+                {
+                    // Accept the request if the time difference is within 3 seconds
+                    user.WatchedVideoId = request.WatchedVideoId;
+                    user.WatchedTimeInSeconds = request.WatchedTimeInSeconds;
+                    await _applicationDbContext.SaveChangesAsync();
+                    return Ok("Watched video updated successfully");
+                }
+                else
+                {
+                    return BadRequest("Invalid time or duration exceeded");
+                }
+
+            }
+            else
+            {
+                return BadRequest("Invalid video ID");
             }
         }
     }
