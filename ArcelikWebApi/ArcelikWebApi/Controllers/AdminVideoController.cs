@@ -12,16 +12,15 @@ namespace ArcelikWebApi.Controllers
     public class AdminVideoController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly IBlobService _blobService;
+        private readonly IDigitalOceanSpacesService _blobService;
 
-        public AdminVideoController(ApplicationDbContext dbContext, IBlobService blobService)
+        public AdminVideoController(ApplicationDbContext dbContext, IDigitalOceanSpacesService blobService)
         {
             _dbContext = dbContext;
             _blobService = blobService;
         }
 
         [HttpGet]
-
         public async Task<IActionResult> GetAllVideos()
         {
             var videos = await _dbContext.Videos
@@ -31,7 +30,6 @@ namespace ArcelikWebApi.Controllers
             return Ok(videos);
         }
 
-
         [HttpPost("upload")]
         public async Task<IActionResult> UploadVideo([FromForm] CreateVideoDTO videoDto)
         {
@@ -40,8 +38,8 @@ namespace ArcelikWebApi.Controllers
                 return BadRequest("Video file is missing or empty.");
             }
 
-            // Upload the video file to Azure Blob Storage
-            var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, "videos");
+            // Upload the video file to DigitalOcean Spaces
+            var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, videoDto.VideoFile.FileName);
 
             // Save the video metadata to the database
             var newVideo = new Video
@@ -66,11 +64,10 @@ namespace ArcelikWebApi.Controllers
                 return NotFound();
             }
 
-            // Delete the blob from blob storage
-            await _blobService.Delete(video.BlobStorageUrl, "videos"); // Replace "containerName" with your actual container name
+            // Delete the blob from DigitalOcean Spaces
+            await _blobService.Delete(video.BlobStorageUrl);
 
             _dbContext.Videos.Remove(video);
-
             await _dbContext.SaveChangesAsync();
 
             return NoContent(); // Return 204 No Content on successful deletion
@@ -96,8 +93,8 @@ namespace ArcelikWebApi.Controllers
             // Update the video file if provided
             if (videoDto.VideoFile != null && videoDto.VideoFile.Length > 0)
             {
-                // Upload the new video file to Azure Blob Storage
-                var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, "videos");
+                // Upload the new video file to DigitalOcean Spaces
+                var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, videoDto.VideoFile.FileName);
                 video.BlobStorageUrl = blobStorageUrl;
             }
 
@@ -112,6 +109,5 @@ namespace ArcelikWebApi.Controllers
 
             return Ok(video); // Return the updated video object
         }
-
     }
 }

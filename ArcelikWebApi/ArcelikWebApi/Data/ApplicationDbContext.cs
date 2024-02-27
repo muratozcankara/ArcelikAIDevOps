@@ -1,11 +1,6 @@
-﻿using System;
-using static System.Net.Mime.MediaTypeNames;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ArcelikWebApi.Models;
 using ArcelikWebApi.Models.Quiz;
-using Microsoft.Extensions.Options;
 
 namespace ArcelikWebApi.Data
 {
@@ -65,11 +60,13 @@ namespace ArcelikWebApi.Data
                 .HasForeignKey<CorrectText>(c => c.QuestionID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            /* unnecessary
             modelBuilder.Entity<Video>().HasData(
                 new Video { Id = 2, Title = "Video 2", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample2.mp4" },
                 new Video { Id = 3, Title = "Video 3", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4" },
                 new Video { Id = 4, Title = "Video 4", BlobStorageUrl = "https://arcelikstorage.blob.core.windows.net/videos/sample3.mp4" }
             );
+            */
 
             modelBuilder.Entity<Questions>().HasData(
                 // 3 MultipleChoice QuestionType
