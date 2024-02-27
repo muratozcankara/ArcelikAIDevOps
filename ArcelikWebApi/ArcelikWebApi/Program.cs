@@ -1,11 +1,11 @@
 ﻿using ArcelikWebApi.Data;
 using ArcelikWebApi.Middlewares;
 using ArcelikWebApi.Services;
-using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Serialization;
+using MySql.Data;
 
 
 
@@ -21,11 +21,6 @@ builder.Services.AddSingleton<IConfigurationManager<OpenIdConnectConfiguration>>
         new OpenIdConnectConfigurationRetriever(),
     new HttpDocumentRetriever()); ;
     return configurationManager;
-});
-
-builder.Services.AddScoped(_ =>
-{
-    return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
 });
 
 builder.Services.AddScoped<IDigitalOceanSpacesService, DigitalOceanSpacesService>();
@@ -56,6 +51,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
     builder.Configuration["ConnectionStrings:DefaultConnection"],
     ServerVersion.AutoDetect(builder.Configuration["ConnectionStrings:DefaultConnection"])
 ));
+
+
 
 
 var app = builder.Build();
