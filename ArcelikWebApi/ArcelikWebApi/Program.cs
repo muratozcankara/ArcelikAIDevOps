@@ -1,15 +1,13 @@
 ﻿using ArcelikWebApi.Data;
 using ArcelikWebApi.Middlewares;
-using ArcelikWebApi.Models;
 using ArcelikWebApi.Services;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Serialization;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +28,7 @@ builder.Services.AddScoped(_ =>
     return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
 });
 
-builder.Services.AddScoped<IBlobService, BlobService>();
+builder.Services.AddScoped<IDigitalOceanSpacesService, DigitalOceanSpacesService>();
 
 builder.Services.AddScoped<TokenValidationMiddleware>();
 
@@ -41,7 +39,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(c =>
 {
-    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyMethod());
+    c.AddPolicy("AllowOrigin", 
+        options => options
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyMethod());
 });
 
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
@@ -49,8 +51,11 @@ options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoop
     .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver =
     new DefaultContractResolver());
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
-builder.Configuration["ConnectionStrings:DefaultConnection"]));
+
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
+    builder.Configuration["ConnectionStrings:DefaultConnection"],
+    ServerVersion.AutoDetect(builder.Configuration["ConnectionStrings:DefaultConnection"])
+));
 
 
 var app = builder.Build();

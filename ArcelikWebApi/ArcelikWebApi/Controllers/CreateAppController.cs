@@ -13,9 +13,9 @@ namespace ArcelikWebApi.Controllers
     public class CreateAppController : ControllerBase
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        private readonly IBlobService _blobService;
+        private readonly IDigitalOceanSpacesService _blobService;
 
-        public CreateAppController(ApplicationDbContext applicationDbContext, IBlobService BlobService)
+        public CreateAppController(ApplicationDbContext applicationDbContext, IDigitalOceanSpacesService BlobService)
         {
             _applicationDbContext = applicationDbContext;
             _blobService = BlobService;
