@@ -20,8 +20,8 @@ namespace ArcelikWebApi.Controllers
             _blobService = blobService;
         }
 
+        //getvideos with ids and titles to the admin dashboard
         [HttpGet]
-
         public async Task<IActionResult> GetAllVideos()
         {
             var videos = await _dbContext.Videos

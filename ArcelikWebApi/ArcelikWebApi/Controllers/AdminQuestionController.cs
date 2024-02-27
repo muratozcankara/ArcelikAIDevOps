@@ -1,5 +1,6 @@
 ﻿using ArcelikWebApi.Data;
 using ArcelikWebApi.Models;
+using ArcelikWebApi.Models.Admin;
 using ArcelikWebApi.Models.Quiz;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -229,8 +230,8 @@ namespace ArcelikWebApi.Controllers
         }
 
 
-        [HttpPut("{id}/update-text")] 
-        public async Task<IActionResult> UpdateQuestionText(int id, [FromBody] string questionText)
+        [HttpPut("{id}")] 
+        public async Task<IActionResult> UpdateQuestionText(int id, [FromForm] string questionText)
         {
             // Retrieve the question by ID
             var question = await _applicationDbContext.Questions.FirstOrDefaultAsync(q => q.QuestionID == id);
@@ -247,7 +248,7 @@ namespace ArcelikWebApi.Controllers
             {
                 // Save changes to the database
                 await _applicationDbContext.SaveChangesAsync();
-                return Ok(questionText); // 204 No Content
+                return Ok(questionText); 
             }
             catch (Exception ex)
             {

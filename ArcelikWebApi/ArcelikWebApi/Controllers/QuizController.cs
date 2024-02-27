@@ -10,7 +10,6 @@ namespace ArcelikWebApi.Controllers
     public class QuizController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        //private static List<QuestionDTO> _staticQuestions = new List<QuestionDTO>(); // Initialized with an empty list, Cache for static questions
 
         public QuizController(ApplicationDbContext context)
         {
@@ -30,6 +29,7 @@ namespace ArcelikWebApi.Controllers
             return Ok(isPassed);
         }
 
+        //this is to send questions to the frontend to show them to user
         [HttpGet("questions")]
         public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions()
         {
@@ -209,6 +209,11 @@ namespace ArcelikWebApi.Controllers
                 var user = _context.Users
                                     .Where(u => u.Email == userEmailFromContext)
                                     .FirstOrDefault();
+
+                if (user == null)
+                {
+                    return BadRequest("User is not valid.");
+                }
 
                 // Add OverallScore to QuizPoint column where userID == userID
                 user.QuizPoint = OverallScore;
