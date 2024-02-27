@@ -159,6 +159,104 @@ namespace ArcelikWebApi.Controllers
 
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteQuestion(int id)
+        {
+            var question = await _applicationDbContext.Questions
+                .FirstOrDefaultAsync(q => q.QuestionID == id);
+
+            if (question == null)
+            {
+                return NotFound();
+            }
+
+            switch (question.QuestionType)
+            {
+                case "MultipleChoiceAndAnswers":
+                case "MultipleChoice":
+                case "TrueFalse":
+                    // Delete CorrectChoices rows associated with Multiple Answers questions
+                    var correctChoices = await _applicationDbContext.CorrectChoices
+                        .Where(cc => cc.QuestionID == id)
+                        .ToListAsync();
+
+                    _applicationDbContext.CorrectChoices.RemoveRange(correctChoices);
+
+                    break;
+
+                case "Sorting":
+                    // Delete CorrectSorting row associated with Sorting questions
+                    var correctSorting = await _applicationDbContext.CorrectSorting
+                        .FirstOrDefaultAsync(cs => cs.QuestionID == id);
+
+                    if (correctSorting != null)
+                    {
+                        _applicationDbContext.CorrectSorting.Remove(correctSorting);
+                    }
+
+                    break;
+
+                case "FillInTheBlank":
+                    // Delete CorrectText row associated with Fill in the Blank questions
+                    var correctText = await _applicationDbContext.CorrectText
+                        .FirstOrDefaultAsync(ct => ct.QuestionID == id);
+
+                    if (correctText != null)
+                    {
+                        _applicationDbContext.CorrectText.Remove(correctText);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (question.QuestionType != "FillInTheBlank")
+            {
+                // Delete related Choices rows if the question type is not FillInTheBlank
+                var choices = await _applicationDbContext.Choices
+                    .Where(c => c.QuestionID == id)
+                    .ToListAsync();
+
+                _applicationDbContext.Choices.RemoveRange(choices);
+            }
+            // Delete the Questions row
+            _applicationDbContext.Questions.Remove(question);
+
+            await _applicationDbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+        [HttpPut("{id}/update-text")] 
+        public async Task<IActionResult> UpdateQuestionText(int id, [FromBody] string questionText)
+        {
+            // Retrieve the question by ID
+            var question = await _applicationDbContext.Questions.FirstOrDefaultAsync(q => q.QuestionID == id);
+
+            if (question == null)
+            {
+                return NotFound();
+            }
+
+            // Update the question text
+            question.QuestionText = questionText;
+
+            try
+            {
+                // Save changes to the database
+                await _applicationDbContext.SaveChangesAsync();
+                return Ok(questionText); // 204 No Content
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it accordingly
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+
 
     }
 }
