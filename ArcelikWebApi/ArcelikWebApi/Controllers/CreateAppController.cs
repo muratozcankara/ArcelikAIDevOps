@@ -13,9 +13,9 @@ namespace ArcelikWebApi.Controllers
     public class CreateAppController : ControllerBase
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        private readonly IDigitalOceanSpacesService _blobService;
+        private readonly IBlobService _blobService;
 
-        public CreateAppController(ApplicationDbContext applicationDbContext, IDigitalOceanSpacesService BlobService)
+        public CreateAppController(ApplicationDbContext applicationDbContext, IBlobService BlobService)
         {
             _applicationDbContext = applicationDbContext;
             _blobService = BlobService;
@@ -68,7 +68,7 @@ namespace ArcelikWebApi.Controllers
 
                     foreach (var pdfFile in formData.Pdfs)
                     {
-                        string blobUrl = await _blobService.Upload(pdfFile, "file-upload");
+                        string blobUrl = await _blobService.Upload(pdfFile, "files");
                         blobUrls.Add(blobUrl);
                     }
                 aiApplication.Pdfs_Urls = string.Join(",", blobUrls);

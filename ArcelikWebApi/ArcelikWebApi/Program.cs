@@ -23,7 +23,7 @@ builder.Services.AddSingleton<IConfigurationManager<OpenIdConnectConfiguration>>
     return configurationManager;
 });
 
-builder.Services.AddScoped<IDigitalOceanSpacesService, DigitalOceanSpacesService>();
+builder.Services.AddScoped<IBlobService, BlobService>();
 
 builder.Services.AddScoped<TokenValidationMiddleware>();
 
@@ -51,8 +51,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
     builder.Configuration["ConnectionStrings:DefaultConnection"],
     ServerVersion.AutoDetect(builder.Configuration["ConnectionStrings:DefaultConnection"])
 ));
-
-
 
 
 var app = builder.Build();

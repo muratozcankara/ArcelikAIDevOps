@@ -195,7 +195,6 @@ namespace ArcelikWebApi.Data
                 new ApplicationSettings { id = 1, LandingUrl = "Somelink will be here", SupportedFileTypes = "Pdf" });
 
        
-
         }
 
     } 

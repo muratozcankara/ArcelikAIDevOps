@@ -15,7 +15,6 @@ namespace ArcelikWebApi.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
-        // Get iswatched attirubute from db.
         // GET: api/uservideo/status
         [HttpGet("status")]
         public async Task<IActionResult> GetUserVideoStatus()
@@ -54,7 +53,7 @@ namespace ArcelikWebApi.Controllers
         }
 
 
-        // POST: api/uservideo/watched
+        // POST: api/uservideo/updatewatched
         [HttpPost("updatewatched")]
         public async Task<IActionResult> UpdateWatchedStatus([FromBody] WatchedVideoUpdateRequest request)
         {
@@ -82,7 +81,6 @@ namespace ArcelikWebApi.Controllers
                     // Update the watched video and time
                     user.WatchedVideoId = request.WatchedVideoId;
                     user.WatchedTimeInSeconds = request.WatchedTimeInSeconds;
-                    //.isWatchedAll = request.IsWatchedAll;
 
                     await _applicationDbContext.SaveChangesAsync();
 
@@ -98,39 +96,5 @@ namespace ArcelikWebApi.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        /*[HttpPost("updatetutorial")]
-        public async Task<IActionResult> UpdateTutorialStatus([FromBody] TutorialViewModel tutorialrequest)
-        {
-            try
-            {
-                var userEmail = HttpContext.Items["UserEmail"] as string;
-
-                if (userEmail != null)
-                {
-                    // Find the user by email
-                    var user = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-
-                    if (user == null)
-                    {
-                        return NotFound("User not found"); // Customize the response as needed
-                    }
-
-                    user.isTutorialDone = tutorialrequest.isTutorialDone;
-
-                    await _applicationDbContext.SaveChangesAsync();
-
-                    return Ok("Tutorial status updated successfully");
-                }
-
-                else
-                {
-                    return BadRequest("User email not provided in the request"); // Customize the response as needed
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }*/
     }
 }
