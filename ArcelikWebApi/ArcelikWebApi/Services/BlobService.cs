@@ -1,12 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using MediaToolkit;
-using MediaToolkit.Model;
-using ArcelikWebApi.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Azure.Storage.Blobs;
 
 namespace ArcelikWebApi.Services
 {
@@ -46,34 +38,6 @@ namespace ArcelikWebApi.Services
 
             await blobClient.DeleteIfExistsAsync();
         }
-
-        public TimeSpan GetVideoDurationFromUrl(string videoUrl)
-        {
-            var tempFilePath = DownloadVideoFromUrl(videoUrl);
-            var duration = GetVideoDuration(tempFilePath);
-            // Delete the temporary downloaded file
-            File.Delete(tempFilePath);
-            return duration;
-        }
-
-        private string DownloadVideoFromUrl(string videoUrl)
-        {
-            var tempFilePath = Path.GetTempFileName();
-            using (var webClient = new WebClient())
-            {
-                webClient.DownloadFile(videoUrl, tempFilePath);
-            }
-            return tempFilePath;
-        }
-
-        private TimeSpan GetVideoDuration(string filePath)
-        {
-            var inputFile = new MediaFile { Filename = filePath };
-            using (var engine = new Engine())
-            {
-                engine.GetMetadata(inputFile);
-            }
-            return inputFile.Metadata.Duration;
-        }
+      
     }
 }
