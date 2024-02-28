@@ -1,20 +1,22 @@
-﻿using Azure.Storage.Blobs;
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using MediaToolkit;
 using MediaToolkit.Model;
 using ArcelikWebApi.Models;
-using ArcelikWebApi.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace ArcelikWebApi.Services
 {
     public class BlobService : IBlobService
     {
         private readonly BlobServiceClient _blobServiceClient;
-        private readonly ApplicationDbContext _dbContext;
 
-        public BlobService(BlobServiceClient blobServiceClient, ApplicationDbContext dbContext)
+        public BlobService(BlobServiceClient blobServiceClient)
         {
             _blobServiceClient = blobServiceClient;
-            _dbContext = dbContext;
         }
 
         public async Task<string> Upload(IFormFile fileUpload, string containername)
@@ -28,20 +30,8 @@ namespace ArcelikWebApi.Services
             // Upload the video file to blob storage
             await blobClient.UploadAsync(fileUpload.OpenReadStream());
 
-            // Extract video duration using MediaToolkit
-            var videoDuration = await ExtractVideoDuration(blobClient.Uri);
-
-            // Save video duration to the database
-            var video = new Video
-            {
-                DurationInSeconds = (int)videoDuration.TotalSeconds
-            };
-
-            _dbContext.Videos.Add(video);
-            await _dbContext.SaveChangesAsync();
-
             // Construct and return the Blob URL along with the duration
-            return $"{blobClient.Uri.ToString()}|{videoDuration.TotalSeconds}";
+            return $"{blobClient.Uri.ToString()}";
         }
 
         public async Task Delete(string blobUrl, string containername)
@@ -50,40 +40,40 @@ namespace ArcelikWebApi.Services
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
 
             // Parse the blob name from the blob URL
-            var blobName = new Uri(blobUrl).Segments.Last();
+            var blobName = new Uri(blobUrl).Segments[^1]; // Using index to get the last segment
 
             var blobClient = containerClient.GetBlobClient(blobName);
 
             await blobClient.DeleteIfExistsAsync();
         }
 
-        private async Task<TimeSpan> ExtractVideoDuration(Uri blobUri)
+        public TimeSpan GetVideoDurationFromUrl(string videoUrl)
         {
-            using (var fileStream = await DownloadBlob(blobUri))
-            {
-                var inputFile = new MediaFile { Filename = blobUri.LocalPath };
-                using (var engine = new Engine())
-                {
-                    engine.GetMetadata(inputFile);
-                    var duration = inputFile.Metadata.Duration;
-
-                    if (duration != null)
-                    {
-                        return TimeSpan.FromSeconds(duration.TotalSeconds);
-                    }
-                    else
-                    {
-                        return TimeSpan.Zero; // Or any default value you prefer
-                    }
-                }
-            }
+            var tempFilePath = DownloadVideoFromUrl(videoUrl);
+            var duration = GetVideoDuration(tempFilePath);
+            // Delete the temporary downloaded file
+            File.Delete(tempFilePath);
+            return duration;
         }
 
-        private async Task<Stream> DownloadBlob(Uri blobUri)
+        private string DownloadVideoFromUrl(string videoUrl)
         {
-            var blobClient = new BlobClient(blobUri);
-            var blobDownloadInfo = await blobClient.DownloadAsync();
-            return blobDownloadInfo.Value.Content;
+            var tempFilePath = Path.GetTempFileName();
+            using (var webClient = new WebClient())
+            {
+                webClient.DownloadFile(videoUrl, tempFilePath);
+            }
+            return tempFilePath;
+        }
+
+        private TimeSpan GetVideoDuration(string filePath)
+        {
+            var inputFile = new MediaFile { Filename = filePath };
+            using (var engine = new Engine())
+            {
+                engine.GetMetadata(inputFile);
+            }
+            return inputFile.Metadata.Duration;
         }
     }
 }
