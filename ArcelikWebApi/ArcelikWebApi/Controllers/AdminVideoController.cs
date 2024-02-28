@@ -4,6 +4,7 @@ using ArcelikWebApi.Models;
 using ArcelikWebApi.Services;
 using ArcelikWebApi.Data;
 using ArcelikWebApi.Models.Admin;
+using Azure.Storage.Blobs;
 
 namespace ArcelikWebApi.Controllers
 {
@@ -43,11 +44,18 @@ namespace ArcelikWebApi.Controllers
             // Upload the video file to Azure Blob Storage
             var blobStorageUrl = await _blobService.Upload(videoDto.VideoFile, "videos");
 
+            // Extract video duration using BlobService
+            var videoDuration = _blobService.GetVideoDurationFromUrl(blobStorageUrl);
+
+            // Convert TimeSpan to int representing duration in seconds
+            int durationInSeconds = (int)videoDuration.TotalSeconds;
+
             // Save the video metadata to the database
             var newVideo = new Video
             {
                 Title = videoDto.Title,
-                BlobStorageUrl = blobStorageUrl
+                BlobStorageUrl = blobStorageUrl,
+                DurationInSeconds = durationInSeconds
             };
 
             _dbContext.Videos.Add(newVideo);

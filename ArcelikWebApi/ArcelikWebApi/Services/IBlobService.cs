@@ -8,6 +8,9 @@ namespace ArcelikWebApi.Services
     {
         Task<string> Upload(IFormFile fileUpload, string containername);
 
-        Task Delete(string blobUrl, string containername); //henüz  yapılmadı
+        Task Delete(string blobUrl, string containername);
+
+        TimeSpan GetVideoDurationFromUrl(string videoUrl);
+
     }
 }
