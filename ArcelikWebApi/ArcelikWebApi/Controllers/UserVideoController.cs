@@ -43,9 +43,9 @@ namespace ArcelikWebApi.Controllers
                 .Where(v => v.Id == lastVideoId)
                 .Select(v => v.DurationInSeconds)
                 .FirstOrDefaultAsync();
-                                    
-            
-            var isWatchedAll = userStatus.WatchedVideoId >= lastVideoId && userStatus.WatchedTimeInSeconds >= lastTimeInSeconds;
+
+
+            var isWatchedAll = userStatus.WatchedVideoId >= lastVideoId && userStatus.WatchedTimeInSeconds >= (lastTimeInSeconds - 3);
 
             var videoDetails = await _applicationDbContext.Videos
                 .Select(video => new { video.Id, video.BlobStorageUrl })
