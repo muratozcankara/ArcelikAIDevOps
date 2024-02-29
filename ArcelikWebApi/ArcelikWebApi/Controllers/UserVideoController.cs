@@ -37,9 +37,14 @@ namespace ArcelikWebApi.Controllers
                 return NotFound("User not found");
 
             var videoCount = await _applicationDbContext.Videos.CountAsync();
-            var lastVideoId = await _applicationDbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
-            var lastTimeInSeconds = 16;
 
+            var lastVideoId = await _applicationDbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
+            var lastTimeInSeconds = await _applicationDbContext.Videos
+                .Where(v => v.Id == lastVideoId)
+                .Select(v => v.DurationInSeconds)
+                .FirstOrDefaultAsync();
+                                    
+            
             var isWatchedAll = userStatus.WatchedVideoId >= lastVideoId && userStatus.WatchedTimeInSeconds >= lastTimeInSeconds;
 
             var videoDetails = await _applicationDbContext.Videos
@@ -79,9 +84,17 @@ namespace ArcelikWebApi.Controllers
                 if (request.WatchedTimeInSeconds - user.WatchedTimeInSeconds <= 3)
                 {
                     // Update the watched video and time
+                    var lastVideoId = await _applicationDbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
+                    var lastTimeInSeconds = await _applicationDbContext.Videos
+                        .Where(v => v.Id == lastVideoId)
+                        .Select(v => v.DurationInSeconds)
+                        .FirstOrDefaultAsync();
+
+
+                    var isWatchedAll = user.WatchedVideoId >= lastVideoId && user.WatchedTimeInSeconds >= (lastTimeInSeconds - 3);
                     user.WatchedTimeInSeconds = request.WatchedTimeInSeconds;
                     await _applicationDbContext.SaveChangesAsync();
-                    return Ok("Watched video updated successfully");
+                    return Ok(isWatchedAll);
                 }
                 else
                 {
@@ -104,10 +117,18 @@ namespace ArcelikWebApi.Controllers
                 if (timeDifference <= 3)
                 {
                     // Accept the request if the time difference is within 3 seconds
+                    var lastVideoId = await _applicationDbContext.Videos.MaxAsync(v => (int?)v.Id) ?? 0;
+                    var lastTimeInSeconds = await _applicationDbContext.Videos
+                        .Where(v => v.Id == lastVideoId)
+                        .Select(v => v.DurationInSeconds)
+                        .FirstOrDefaultAsync();
+
+
+                    var isWatchedAll = user.WatchedVideoId >= lastVideoId && user.WatchedTimeInSeconds >= (lastTimeInSeconds - 3);
                     user.WatchedVideoId = request.WatchedVideoId;
                     user.WatchedTimeInSeconds = request.WatchedTimeInSeconds;
                     await _applicationDbContext.SaveChangesAsync();
-                    return Ok("Watched video updated successfully");
+                    return Ok(isWatchedAll);
                 }
                 else
                 {
