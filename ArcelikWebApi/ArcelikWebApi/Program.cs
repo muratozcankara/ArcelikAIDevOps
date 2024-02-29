@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Serialization;
 using MySql.Data;
 using Azure.Storage.Blobs;
+using AspNetCoreRateLimit;
 
 
 
@@ -59,6 +60,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
 ));
 
 
+// Configure rate limiting options
+builder.Services.AddOptions();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 var app = builder.Build();
 
 app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
@@ -69,6 +79,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseIpRateLimiting();
 
 app.UseMiddleware<TokenValidationMiddleware>();
 

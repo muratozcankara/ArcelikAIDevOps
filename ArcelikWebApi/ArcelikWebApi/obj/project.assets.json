@@ -2,6 +2,24 @@
   "version": 3,
   "targets": {
     "net7.0": {
+      "AspNetCoreRateLimit/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.3",
+          "Microsoft.Extensions.Options": "6.0.0",
+          "Newtonsoft.Json": "13.0.2"
+        },
+        "compile": {
+          "lib/net6.0/AspNetCoreRateLimit.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/AspNetCoreRateLimit.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "AWSSDK.Core/3.7.302.12": {
         "type": "package",
         "compile": {
@@ -1617,6 +1635,18 @@
     }
   },
   "libraries": {
+    "AspNetCoreRateLimit/5.0.0": {
+      "sha512": "6fq9+o1maGADUmpK/PvcF0DtXW2+7bSkIL7MDIo/agbIHKN8XkMQF4oze60DO731WaQmHmK260hB30FwPzCmEg==",
+      "type": "package",
+      "path": "aspnetcoreratelimit/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "aspnetcoreratelimit.5.0.0.nupkg.sha512",
+        "aspnetcoreratelimit.nuspec",
+        "lib/net6.0/AspNetCoreRateLimit.dll"
+      ]
+    },
     "AWSSDK.Core/3.7.302.12": {
       "sha512": "OaFHc2FD3vYldtdaH0Sqob3NoTXFBBMKxmq/VV3of5l+hHZmcaAjpJhh1Et0BxggeHqimVOTaoQxEO0PXQHeuw==",
       "type": "package",
@@ -4634,6 +4664,7 @@
   "projectFileDependencyGroups": {
     "net7.0": [
       "AWSSDK.S3 >= 3.7.305.28",
+      "AspNetCoreRateLimit >= 5.0.0",
       "Azure.Storage.Blobs >= 12.19.1",
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 6.0.25",
       "Microsoft.AspNetCore.OpenApi >= 7.0.11",
@@ -4695,6 +4726,10 @@
           "AWSSDK.S3": {
             "target": "Package",
             "version": "[3.7.305.28, )"
+          },
+          "AspNetCoreRateLimit": {
+            "target": "Package",
+            "version": "[5.0.0, )"
           },
           "Azure.Storage.Blobs": {
             "target": "Package",
