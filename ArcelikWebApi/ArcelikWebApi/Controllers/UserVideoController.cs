@@ -136,6 +136,10 @@ namespace ArcelikWebApi.Controllers
                 }
 
             }
+            else if (request.WatchedVideoId < user.WatchedVideoId)
+            {
+                return BadRequest("Tekrar izlediğiniz için daha iyi öğreneceksiniz.");
+            }
             else
             {
                 return BadRequest("Hile yapmayın lütfen, videoları izlemenizi öneririz.");

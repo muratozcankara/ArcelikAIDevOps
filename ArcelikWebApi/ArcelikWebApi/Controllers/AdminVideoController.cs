@@ -32,7 +32,6 @@ namespace ArcelikWebApi.Controllers
             return Ok(videos);
         }
 
-
         [HttpPost("upload")]
         public async Task<IActionResult> UploadVideo([FromForm] CreateVideoDTO videoDto)
         {

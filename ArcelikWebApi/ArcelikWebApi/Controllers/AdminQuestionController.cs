@@ -19,7 +19,7 @@ namespace ArcelikWebApi.Controllers
         {
             _applicationDbContext = applicationDbContext;
         }
-        // POST api/values
+        // POST api/adminquestion/postquestion
         [HttpPost("postquestion")]
         public async Task<IActionResult> Post([FromBody] CreateQuestionDTO questionDTO)
         {
@@ -160,6 +160,7 @@ namespace ArcelikWebApi.Controllers
 
         }
 
+        // DELETE api/adminquestion/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteQuestion(int id)
         {
@@ -229,7 +230,6 @@ namespace ArcelikWebApi.Controllers
             return NoContent();
         }
 
-
         [HttpPut("{id}")] 
         public async Task<IActionResult> UpdateQuestionText(int id, [FromForm] string questionText)
         {
@@ -256,7 +256,6 @@ namespace ArcelikWebApi.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
 
 
     }
