@@ -3,7 +3,7 @@ namespace ArcelikWebApi.Models
 {
     public class WatchedVideoUpdateRequest
     {
-        public bool IsWatchedAll { get; set; }
+        public bool? IsWatchedAll { get; set; }
 
         public int WatchedVideoId { get; set; }
 
