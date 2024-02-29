@@ -85,7 +85,7 @@ namespace ArcelikWebApi.Controllers
                 }
                 else
                 {
-                    return BadRequest("Invalid time or duration exceeded");
+                    return BadRequest("Hile yapmayın lütfen, videoları izlemenizi öneririz.");
                 }
             }
             else if (request.WatchedVideoId > user.WatchedVideoId && (request.WatchedVideoId - user.WatchedVideoId) <= 1)
@@ -111,13 +111,13 @@ namespace ArcelikWebApi.Controllers
                 }
                 else
                 {
-                    return BadRequest("Invalid time or duration exceeded");
+                    return BadRequest("Hile yapmayın lütfen, videoları izlemenizi öneririz.");
                 }
 
             }
             else
             {
-                return BadRequest("Invalid video ID");
+                return BadRequest("Hile yapmayın lütfen, videoları izlemenizi öneririz.");
             }
         }
     }
